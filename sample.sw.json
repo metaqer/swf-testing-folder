@@ -1,7 +1,7 @@
 {
   "id": "expression",
   "version": "1.0",
-  "name": "Workflow Expression example 123",
+  "name": "Workflow Expression example 123456",
   "constants" : {
     "Dog" : {
       "castellano" : "perro",
@@ -13,7 +13,7 @@
     }    
   },
   "description": "An example of how to use a JQ expression assignment",
-  "start": "squareState",
+  "start": "squareStateTest",
   "functions": [
     {
       "name": "sendQueryNew",
@@ -33,7 +33,7 @@
   ],
   "states": [
     {
-      "name": "squareState",
+      "name": "squareStateTest",
       "type": "operation",
       "actions": [
         {
