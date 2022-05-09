@@ -1,7 +1,7 @@
 {
   "id": "expression",
   "version": "1.0",
-  "name": "Workflow Expression example 123456aaa",
+  "name": "Workflow Expression example 123",
   "constants" : {
     "Dog" : {
       "castellano" : "perro",
