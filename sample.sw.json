@@ -1,106 +1,71 @@
 {
-  "id": "expression",
+  "id": "eventbasedswitch",
   "version": "1.0",
-  "name": "Workflow Expression example 123456",
-  "constants" : {
-    "Dog" : {
-      "castellano" : "perro",
-      "leones": "perru",
-      "gallego" : "can",
-      "aragones" : "cocho",
-      "catalan" : "gos",
-      "vasco": "txakurra"
-    }    
-  },
-  "description": "An example of how to use a JQ expression assignment",
-  "start": "squareStateTest",
-  "functions": [
+  "specVersion": "0.7",
+  "name": "Event Based Switch Transitions",
+  "description": "Event Based Switch Transitions",
+  "start": "CheckVisaStatus",
+  "events": [    
     {
-      "name": "sendQueryNew",
-      "operation": "specs/query-service.yml#sendQueryNew",
-      "type": "rest"
+      "name": "visaApprovedEvent",
+      "type": "VisaApproved",
+      "source": "visaCheckSource"
     },
     {
-      "name": "max",
-      "type": "expression",
-      "operation": "{max: .numbers | max_by(.x), min: .numbers | min_by(.y)}"
-    },
-    {
-      "name": "printMessage",
-      "type": "custom",
-      "operation": "sysout"
+      "name": "visaRejectedEvent",
+      "type": "VisaRejected",
+      "source": "visaCheckSource"
     }
   ],
   "states": [
     {
-      "name": "squareStateTest",
-      "type": "operation",
-      "actions": [
+      "name": "CheckVisaStatus",
+      "type": "switch",
+      "eventConditions": [
         {
-              "name": "myAction", "functionRef":{
-            "refName": {
-              "refName": "sendQueryNew",
-              "arguments": {
-                "another": "",
-                "query": ""
-              }
-            }
-          
-          },
+          "eventRef": "visaApprovedEvent",
+          "transition": "HandleApprovedVisa"
         },
         {
-          "name": "maxAction",
-          "functionRef": {
-            "refName": "max"
-          },
-          "actionDataFilter": {
-             "results" : ".max.x", 
-             "toStateData" : ".number"
-          }
+          "eventRef": "visaRejectedEvent",
+          "transition": "HandleRejectedVisa"
         }
       ],
-      "transition": "finish"
+      "eventTimeout": "PT1H",
+      "defaultCondition": {
+        "transition": "HandleNoVisaDecision"
+      }
+      
     },
     {
-      "name": "finish",
+      "name": "HandleApprovedVisa",
       "type": "operation",
-      "stateDataFilter": {
-        "input": "{result: .number}"
-      },
       "actions": [
         {
-          "name": "printAction",
-          "functionRef": {
-            "refName": "sendQuery",
-            "arguments": {
-              "processInstanceId": "",
-              "query": ""
-            }
-          }
-        },
-        {
-          "name": "printAction",
-          "functionRef": {
-            "refName": "sendQuery",
-            "arguments": {
-              "processInstanceId": "",
-              "query": ""
-            }
-          }
-        },
-        {
-          "name": "printAction",
-          "functionRef": {
-            "refName": "printMessage",
-            "arguments": {
-              "message": ".result"
-            }
-          }
+          "subFlowRef": "handleApprovedVisaWorkflowID"
         }
       ],
-      "end": {
-        "terminate": true
-      }
+      "end": true
+    },
+    {
+      "name": "HandleRejectedVisa",
+      "type": "operation",
+      "actions": [
+        {
+          "subFlowRef": "handleRejectedVisaWorkflowID"
+        }
+      ],
+      "end": true
+    },
+    {
+      "name": "HandleNoVisaDecision",
+      "type": "operation",
+      "actions": [
+        {
+          "subFlowRef": "handleNoVisaDecisionWorkflowId"
+        }
+      ],
+      "end": true
     }
   ]
 }
